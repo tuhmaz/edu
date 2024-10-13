@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import html from '@rollup/plugin-html';
 import { glob } from 'glob';
-
+import { visualizer } from 'rollup-plugin-visualizer';
 
 
 /**
@@ -59,9 +59,15 @@ export default defineConfig({
       input: [
         'resources/css/app.css',
         'resources/css/custom.css',
-        'resources/assets/css/demo.css',
+        'resources/css/calendar.css',
+        'resources/css/but.scss',
+        'resources/assets/css/edu.css',
         'resources/js/app.js',
-         'resources/js/img.js',
+        'resources/js/filtercategory.js',
+        'resources/js/img.js',
+        'resources/js/but.js',
+        '/resources/js/waitdon.js',
+        'resources/js/calendar.js',
          'resources/js/hiding.js',
          'resources/js/filter.js',
          'resources/js/filterhome.js',
@@ -79,6 +85,9 @@ export default defineConfig({
       refresh: true
     }),
     html(),
-    libsWindowAssignment()
+    visualizer({
+      filename: './stats.html', // مسار الملف الذي سيتم حفظه للتحليل
+      open: true // فتح التقرير تلقائياً بعد الإنشاء
+    })
   ]
 });

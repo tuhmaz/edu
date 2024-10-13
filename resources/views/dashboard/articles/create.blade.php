@@ -13,7 +13,6 @@
 
 
 
-<!-- عرض رسالة النجاح أو الفشل -->
 @if(session('success'))
 <div class="alert alert-solid-success d-flex align-items-center" role="alert">
   <span class="alert-icon rounded">
