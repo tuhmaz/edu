@@ -24,7 +24,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CalendarController;
-
+use App\Http\Controllers\Api\UserController;
 
 // Open Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -32,10 +32,11 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Protected Routes
 Route::group(['middleware' => 'auth:sanctum'], function () {
-     
+    
     Route::get('/logout', [AuthController::class, 'logout']);
 });
-
+ 
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('api.password.email');
 
 // Setting Database Connection
 Route::post('/set-database', [HomeController::class, 'setDatabase'])->name('api.setDatabase');
@@ -49,6 +50,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('dashboard')->group(function () {
         // Dashboard Index
         Route::get('/', [DashboardController::class, 'index'])->name('api.dashboard.index');
+
+		
+		 // API Resource for Users
+		Route::apiResource('users', UserController::class)->names([
+       'index' => 'api.users.index',
+      'store' => 'api.users.store',
+       'show' => 'api.users.show',
+       'update' => 'api.users.update',
+      'destroy' => 'api.users.destroy',
+    ]);
+	//Route::put('users/{user}/update', [UserController::class, 'update'])->name('api.users.custom_update');
+Route::middleware('auth:sanctum')->group(function () {
+ Route::put('users/{user}/update', [UserController::class, 'update'])->name('api.users.custom_update');
+});
+         
+     Route::get('users/{user}/permissions-roles', [UserController::class, 'permissions_roles'])->name('api.users.permissions_roles');
+     Route::put('users/{user}/permissions-roles', [UserController::class, 'updatePermissionsRoles'])->name('api.users.updatePermissionsRoles');
 
         // School Classes API Routes
         Route::apiResource('/classes', SchoolClassController::class)->middleware(['can:manage classes'])->names([
