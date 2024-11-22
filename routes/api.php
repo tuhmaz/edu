@@ -76,7 +76,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [DashboardController::class, 'index'])->name('api.dashboard.index');
 
         // Users Management
+
+
         Route::apiResource('users', UserController::class)->names('api.users');
+        Route::post('users/{id}/update-profile-photo', [UserController::class, 'updateProfilePhoto'])->name('users.updateProfilePhoto');
+
         Route::get('users/{user}/permissions-roles', [UserController::class, 'permissions_roles'])->name('api.users.permissions_roles');
         Route::put('users/{user}/permissions-roles', [UserController::class, 'updatePermissionsRoles'])->name('api.users.updatePermissionsRoles');
 

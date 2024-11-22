@@ -31,10 +31,10 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\ForgotPasswordController;
 
-Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('password/reset/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name('password.update');
+Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('custom.password.request');
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('custom.password.email');
+Route::get('password/reset/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('custom.password.reset');
+Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name('custom.password.update');
 
 // Open Routes
 Route::post('/register', [AuthController::class, 'register']);

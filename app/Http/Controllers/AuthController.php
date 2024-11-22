@@ -2,87 +2,119 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+
 
 class AuthController extends Controller
 {
-    // POST [ name, email, password ]
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-        Auth::login($user); // تسجيل الدخول بعد التسجيل
-
-        return response()->json([
-          'status' => true,
-          'message' => 'User created successfully',
-          'data' => $user,
-      ], 201); // يجب أن يكون 201
-    }
-
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|string|email',
-        'password' => 'required|string',
+  /**
+   * Register a new user.
+   *
+   * @param \Illuminate\Http\Request $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function register(Request $request)
+  {
+    // Validate the input
+    $validated = $request->validate([
+      'name' => 'required|string|max:255',
+      'email' => 'required|string|email|max:255|unique:users',
+      'password' => 'required|string|confirmed|min:8',
     ]);
 
-    if (!Auth::attempt($request->only('email', 'password'))) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Invalid credentials',
-        ], 401);
+    // Create the user
+    $user = User::create([
+      'name' => $validated['name'],
+      'email' => $validated['email'],
+      'password' => Hash::make($validated['password']),
+    ]);
+
+    // Automatically log in the user
+    Auth::login($user);
+
+    return redirect('/')->with('message', 'Registration successful. Welcome!');
+  }
+
+  /**
+   * Log in the user and return a token.
+   *
+   * @param \Illuminate\Http\Request $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function login(Request $request)
+{
+    // Validate the input
+    $validated = $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string|min:8',
+    ]);
+
+    // Attempt to authenticate the user
+    if (!Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+        throw ValidationException::withMessages([
+            'email' => ['Invalid credentials.'],
+        ]);
     }
 
+    // Retrieve authenticated user
     $user = Auth::user();
-    $token = $user->createToken('myAccessToken')->plainTextToken;
 
+    // Generate a token using Sanctum
+    $token = $user->createToken('AccessToken')->plainTextToken;
+
+    // Return a JSON response
     return response()->json([
-      'status' => true,
-      'message' => 'Login successful',
-      'token' => $token,
-      'user' => $user,
-  ], 200); // يجب أن يكون 200
-
-
+        'status' => true,
+        'message' => 'Login successful.',
+        'token' => $token,
+        'user' => $user,
+    ], 200);
 }
 
 
-    public function profile()
-    {
-        $userData = auth()->user(); // تأكد من أن هذا الاستدعاء يتم بشكل صحيح
+  /**
+   * Get the authenticated user's profile.
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function profile()
+  {
+    $user = auth()->user();
 
-        return response()->json([
-            "status" => true,
-            "message" => "Profile information",
-            "data" => $userData,
-            "id" => auth()->user()->id // ربما تسبب في الخطأ إذا كان `auth()` لم يكن معرفًا بشكل صحيح
-        ]);
+    if (!$user) {
+      return response()->json([
+        'status' => false,
+        'message' => 'User not authenticated.',
+      ], 401);
     }
 
+    return response()->json([
+      'status' => true,
+      'message' => 'Profile information retrieved successfully.',
+      'data' => $user,
+    ], 200);
+  }
 
-    public function logout()
-    {
-        $token = auth()->user()->currentAccessToken();
-        $token->delete();
+  /**
+   * Log out the user and revoke the token.
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function logout()
+  {
+    $user = auth()->user();
 
-        return response()->json([
-            "status" => true,
-            "message" => "User Logged out successfully"
-        ]);
+    if ($user && $user->currentAccessToken()) {
+      $user->currentAccessToken()->delete();
     }
+
+    return response()->json([
+      'status' => true,
+      'message' => 'User logged out successfully.',
+    ], 200);
+  }
 }

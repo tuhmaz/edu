@@ -1,6 +1,6 @@
 @php
-\$customizerHidden = 'customizer-hide';
-\$configData = Helper::appClasses();
+$customizerHidden = 'customizer-hide';
+$configData = Helper::appClasses();
 @endphp
 
 @extends('layouts/layoutMaster')
@@ -26,7 +26,7 @@
   </div>
 </div>
 <div class="container-fluid misc-bg-wrapper">
-  <img src="{{ asset('assets/img/illustrations/bg-shape-image-' . \$configData['style'] . '.png') }}" height="355" alt="{{ __('page-misc-service-unavailable') }}" data-app-light-img="illustrations/bg-shape-image-light.png" data-app-dark-img="illustrations/bg-shape-image-dark.png">
+  <img src="{{ asset('assets/img/illustrations/bg-shape-image-' .$configData['style'] . '.png') }}" height="355" alt="{{ __('page-misc-service-unavailable') }}" data-app-light-img="illustrations/bg-shape-image-light.png" data-app-dark-img="illustrations/bg-shape-image-dark.png">
 </div>
 <!-- /Service Unavailable -->
 @endsection

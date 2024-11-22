@@ -1,7 +1,6 @@
 @php
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-
 $configData = Helper::appClasses();
 @endphp
 
@@ -26,12 +25,12 @@ $configData = Helper::appClasses();
   <ul class="menu-inner py-1">
     @if(isset($menuData[0]) && isset($menuData[0]->menu))
       @foreach ($menuData[0]->menu as $menu)
-        @php
-          $hasPermission = true;
-          if (isset($menu->permission)) {
-            $hasPermission = Auth::user()->can($menu->permission);
-          }
-        @endphp
+      @php
+    $hasPermission = true;
+    if (isset($menu->permission) && Auth::check()) {
+        $hasPermission = Auth::user()->can($menu->permission);
+    }
+@endphp
 
         @if ($hasPermission)
           {{-- adding active and open class if child is active --}}
