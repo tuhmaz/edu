@@ -17,7 +17,6 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|confirmed',
-            'password_confirmation' => 'required|same:password',
         ]);
 
         $user = User::create([
@@ -26,52 +25,43 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
+        Auth::login($user); // تسجيل الدخول بعد التسجيل
+
         return response()->json([
-            'status' => true,
-            'message' => 'User created successfully',
-            'data' => []
-        ]);
+          'status' => true,
+          'message' => 'User created successfully',
+          'data' => $user,
+      ], 201); // يجب أن يكون 201
     }
 
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ]);
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
-        // User object
-        $user = User::where("email", $request->email)->first();
-
-        if (!empty($user)) {
-            // User exists
-            if (Hash::check($request->password, $user->password)) {
-                // Password matched
-                $token = $user->createToken("myAccessToken")->plainTextToken;
-
-                return response()->json([
-                    "status" => true,
-                    "message" => "Login successful",
-                    "token" => $token,
-                    "data" => [
-                        'user' => $user // قم بإضافة بيانات المستخدم هنا
-                    ]
-                ]);
-            } else {
-                return response()->json([
-                    "status" => false,
-                    "message" => "Password didn't match",
-                    "data" => []
-                ]);
-            }
-        } else {
-            return response()->json([
-                "status" => false,
-                "message" => "Invalid Email value",
-                "data" => []
-            ]);
-        }
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Invalid credentials',
+        ], 401);
     }
+
+    $user = Auth::user();
+    $token = $user->createToken('myAccessToken')->plainTextToken;
+
+    return response()->json([
+      'status' => true,
+      'message' => 'Login successful',
+      'token' => $token,
+      'user' => $user,
+  ], 200); // يجب أن يكون 200
+
+
+}
+
+
     public function profile()
     {
         $userData = auth()->user(); // تأكد من أن هذا الاستدعاء يتم بشكل صحيح
