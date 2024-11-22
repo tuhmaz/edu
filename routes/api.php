@@ -32,11 +32,18 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Protected Routes
 Route::group(['middleware' => 'auth:sanctum'], function () {
+<<<<<<< HEAD
     
     Route::get('/logout', [AuthController::class, 'logout']);
 });
  
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('api.password.email');
+=======
+  Route::get('/profile', [AuthController::class, 'profile']);
+  Route::get('/logout', [AuthController::class, 'logout']);
+});
+
+>>>>>>> 70090b3 (Your descriptive commit message here)
 
 // Setting Database Connection
 Route::post('/set-database', [HomeController::class, 'setDatabase'])->name('api.setDatabase');
@@ -47,10 +54,11 @@ Route::post('/upload-file', [ImageUploadController::class, 'uploadFile'])->name(
 
 // Authenticated and Dashboard Routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::prefix('dashboard')->group(function () {
-        // Dashboard Index
-        Route::get('/', [DashboardController::class, 'index'])->name('api.dashboard.index');
+  Route::prefix('dashboard')->group(function () {
+    // Dashboard Index
+    Route::get('/', [DashboardController::class, 'index'])->name('api.dashboard.index');
 
+<<<<<<< HEAD
 		
 		 // API Resource for Users
 		Route::apiResource('users', UserController::class)->names([
@@ -76,105 +84,128 @@ Route::middleware('auth:sanctum')->group(function () {
             'update' => 'api.classes.update',
             'destroy' => 'api.classes.destroy',
         ]);
+=======
+>>>>>>> 70090b3 (Your descriptive commit message here)
 
-        // Subject API Routes
-        Route::apiResource('/subjects', SubjectController::class)->middleware(['can:manage subjects'])->names([
-            'index' => 'api.subjects.index',
-            'store' => 'api.subjects.store',
-            'show' => 'api.subjects.show',
-            'update' => 'api.subjects.update',
-            'destroy' => 'api.subjects.destroy',
-        ]);
+    // API Resource for Users
+    Route::middleware('auth:sanctum')->group(function () {
+      Route::get('/users', [UserController::class, 'index']);
+      Route::post('/users', [UserController::class, 'store']);
+      Route::get('/users/{user}', [UserController::class, 'show']);
+      Route::put('/users/{user}', [UserController::class, 'update']);
+      Route::delete('/users/{user}', [UserController::class, 'destroy']);
+      Route::get('/users/{user}/permissions-roles', [UserController::class, 'permissions_roles']);
+      Route::post('/users/{user}/permissions-roles', [UserController::class, 'updatePermissionsRoles']);
+    });
 
-        // Semester API Routes
-        Route::apiResource('/semesters', SemesterController::class)->names([
-            'index' => 'api.semesters.index',
-            'store' => 'api.semesters.store',
-            'show' => 'api.semesters.show',
-            'update' => 'api.semesters.update',
-            'destroy' => 'api.semesters.destroy',
-        ]);
 
-        // Articles API Routes
-        Route::apiResource('/articles', ArticleController::class)->names([
-            'index' => 'api.articles.index',
-            'store' => 'api.articles.store',
-            'show' => 'api.articles.show',
-            'update' => 'api.articles.update',
-            'destroy' => 'api.articles.destroy',
-        ]);
-        Route::get('/class/{grade_level}', [ArticleController::class, 'indexByClass'])->name('api.articles.forClass');
+    // School Classes API Routes
+    Route::apiResource('/classes', SchoolClassController::class)->middleware(['can:manage classes'])->names([
+      'index' => 'api.classes.index',
+      'store' => 'api.classes.store',
+      'show' => 'api.classes.show',
+      'update' => 'api.classes.update',
+      'destroy' => 'api.classes.destroy',
+    ]);
 
-        // File API Routes
-        Route::apiResource('/files', FileController::class)->names([
-            'index' => 'api.files.index',
-            'store' => 'api.files.store',
-            'show' => 'api.files.show',
-            'update' => 'api.files.update',
-            'destroy' => 'api.files.destroy',
-        ]);
-        Route::get('/files/{id}/download', [FileController::class, 'downloadFile'])->name('api.files.download');
+    // Subject API Routes
+    Route::apiResource('/subjects', SubjectController::class)->middleware(['can:manage subjects'])->names([
+      'index' => 'api.subjects.index',
+      'store' => 'api.subjects.store',
+      'show' => 'api.subjects.show',
+      'update' => 'api.subjects.update',
+      'destroy' => 'api.subjects.destroy',
+    ]);
 
-        // Categories API Routes
-        Route::apiResource('/categories', CategoryController::class)->names([
-            'index' => 'api.categories.index',
-            'store' => 'api.categories.store',
-            'show' => 'api.categories.show',
-            'update' => 'api.categories.update',
-            'destroy' => 'api.categories.destroy',
-        ]);
+    // Semester API Routes
+    Route::apiResource('/semesters', SemesterController::class)->names([
+      'index' => 'api.semesters.index',
+      'store' => 'api.semesters.store',
+      'show' => 'api.semesters.show',
+      'update' => 'api.semesters.update',
+      'destroy' => 'api.semesters.destroy',
+    ]);
 
-        // News API Routes
-        Route::apiResource('/news', NewsController::class)->names([
-            'index' => 'api.news.index',
-            'store' => 'api.news.store',
-            'show' => 'api.news.show',
-            'update' => 'api.news.update',
-            'destroy' => 'api.news.destroy',
-        ]);
+    // Articles API Routes
+    Route::apiResource('/articles', ArticleController::class)->names([
+      'index' => 'api.articles.index',
+      'store' => 'api.articles.store',
+      'show' => 'api.articles.show',
+      'update' => 'api.articles.update',
+      'destroy' => 'api.articles.destroy',
+    ]);
+    Route::get('/class/{grade_level}', [ArticleController::class, 'indexByClass'])->name('api.articles.forClass');
 
-        // Messages API Routes
-        Route::apiResource('/messages', MessageController::class)->names([
-            'index' => 'api.messages.index',
-            'store' => 'api.messages.store',
-            'show' => 'api.messages.show',
-            'update' => 'api.messages.update',
-            'destroy' => 'api.messages.destroy',
-        ]);
+    // File API Routes
+    Route::apiResource('/files', FileController::class)->names([
+      'index' => 'api.files.index',
+      'store' => 'api.files.store',
+      'show' => 'api.files.show',
+      'update' => 'api.files.update',
+      'destroy' => 'api.files.destroy',
+    ]);
+    Route::get('/files/{id}/download', [FileController::class, 'downloadFile'])->name('api.files.download');
 
-        // Notifications API Routes
-        Route::apiResource('/notifications', NotificationController::class)->names([
-            'index' => 'api.notifications.index',
-            'store' => 'api.notifications.store',
-            'show' => 'api.notifications.show',
-            'update' => 'api.notifications.update',
-            'destroy' => 'api.notifications.destroy',
-        ]);
+    // Categories API Routes
+    Route::apiResource('/categories', CategoryController::class)->names([
+      'index' => 'api.categories.index',
+      'store' => 'api.categories.store',
+      'show' => 'api.categories.show',
+      'update' => 'api.categories.update',
+      'destroy' => 'api.categories.destroy',
+    ]);
 
-        // Calendar API Routes
-        Route::apiResource('/calendar', CalendarController::class)->names([
-            'index' => 'api.calendar.index',
-            'store' => 'api.calendar.store',
-            'show' => 'api.calendar.show',
-            'update' => 'api.calendar.update',
-            'destroy' => 'api.calendar.destroy',
-        ]);
+    // News API Routes
+    Route::apiResource('/news', NewsController::class)->names([
+      'index' => 'api.news.index',
+      'store' => 'api.news.store',
+      'show' => 'api.news.show',
+      'update' => 'api.news.update',
+      'destroy' => 'api.news.destroy',
+    ]);
 
-        // Roles, Permissions, Reactions Routes
-        Route::apiResource('/roles', RoleController::class)->names([
-          'index' => 'api.roles.index',
-          'store' => 'api.roles.store',
-          'show' => 'api.roles.show',
-          'update' => 'api.roles.update',
-          'destroy' => 'api.roles.destroy',
-      ]);
+    // Messages API Routes
+    Route::apiResource('/messages', MessageController::class)->names([
+      'index' => 'api.messages.index',
+      'store' => 'api.messages.store',
+      'show' => 'api.messages.show',
+      'update' => 'api.messages.update',
+      'destroy' => 'api.messages.destroy',
+    ]);
 
-      Route::apiResource('/permissions', PermissionController::class)->names([
-        'index' => 'api.permissions.index',
-        'store' => 'api.permissions.store',
-        'show' => 'api.permissions.show',
-        'update' => 'api.permissions.update',
-        'destroy' => 'api.permissions.destroy',
+    // Notifications API Routes
+    Route::apiResource('/notifications', NotificationController::class)->names([
+      'index' => 'api.notifications.index',
+      'store' => 'api.notifications.store',
+      'show' => 'api.notifications.show',
+      'update' => 'api.notifications.update',
+      'destroy' => 'api.notifications.destroy',
+    ]);
+
+    // Calendar API Routes
+    Route::apiResource('/calendar', CalendarController::class)->names([
+      'index' => 'api.calendar.index',
+      'store' => 'api.calendar.store',
+      'show' => 'api.calendar.show',
+      'update' => 'api.calendar.update',
+      'destroy' => 'api.calendar.destroy',
+    ]);
+
+    // Roles, Permissions, Reactions Routes
+    Route::apiResource('/roles', RoleController::class)->names([
+      'index' => 'api.roles.index',
+      'store' => 'api.roles.store',
+      'show' => 'api.roles.show',
+      'update' => 'api.roles.update',
+      'destroy' => 'api.roles.destroy',
+    ]);
+
+    Route::apiResource('/permissions', PermissionController::class)->names([
+      'index' => 'api.permissions.index',
+      'store' => 'api.permissions.store',
+      'show' => 'api.permissions.show',
+      'update' => 'api.permissions.update',
+      'destroy' => 'api.permissions.destroy',
     ]);
 
     Route::apiResource('/reactions', ReactionController::class)->names([
@@ -183,12 +214,12 @@ Route::middleware('auth:sanctum')->group(function () {
       'show' => 'api.reactions.show',
       'update' => 'api.reactions.update',
       'destroy' => 'api.reactions.destroy',
-  ]);
+    ]);
 
 
-        // Comments Route
-        Route::post('/comments', [CommentController::class, 'store'])->name('api.comments.store');
-    });
+    // Comments Route
+    Route::post('/comments', [CommentController::class, 'store'])->name('api.comments.store');
+  });
 });
 
 // Home Controller
@@ -204,18 +235,18 @@ Route::get('/api/files/{semesterId}', [FilterController::class, 'getFileTypesByS
 
 // Database-Specific Routes (by prefix)
 Route::prefix('{database}')->group(function () {
-    Route::get('/news', [FrontendNewsController::class, 'index']);
-    Route::get('/news/{id}', [FrontendNewsController::class, 'show']);
-    Route::get('/news/category/{category}', [FrontendNewsController::class, 'category']);
+  Route::get('/news', [FrontendNewsController::class, 'index']);
+  Route::get('/news/{id}', [FrontendNewsController::class, 'show']);
+  Route::get('/news/category/{category}', [FrontendNewsController::class, 'category']);
 
-    Route::prefix('lesson')->group(function () {
-        Route::get('/', [GradeOneController::class, 'index'])->name('api.lesson.index');
-        Route::get('/{id}', [GradeOneController::class, 'show']);
-        Route::get('subjects/{subject}', [GradeOneController::class, 'showSubject']);
-        Route::get('subjects/{subject}/articles/{semester}/{category}', [GradeOneController::class, 'subjectArticles']);
-        Route::get('/articles/{article}', [GradeOneController::class, 'showArticle']);
-        Route::get('files/download/{id}', [GradeOneController::class, 'downloadFile']);
-    });
+  Route::prefix('lesson')->group(function () {
+    Route::get('/', [GradeOneController::class, 'index'])->name('api.lesson.index');
+    Route::get('/{id}', [GradeOneController::class, 'show']);
+    Route::get('subjects/{subject}', [GradeOneController::class, 'showSubject']);
+    Route::get('subjects/{subject}/articles/{semester}/{category}', [GradeOneController::class, 'subjectArticles']);
+    Route::get('/articles/{article}', [GradeOneController::class, 'showArticle']);
+    Route::get('files/download/{id}', [GradeOneController::class, 'downloadFile']);
+  });
 });
 
 // Keywords Routes
