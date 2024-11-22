@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
 use App\Http\Controllers\pages\MiscError;
-use App\Http\Controllers\authentications\LoginBasic;
-use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
@@ -31,6 +30,11 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 
+
+// Open Routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
@@ -49,87 +53,91 @@ Route::post('/upload-file', [ImageUploadController::class, 'uploadFile'])->name(
 
 Route::get('/lang/{locale}', [LanguageController::class, 'swap'])->name('dashboard.lang-swap');
 
+Route::get('/policy', function () {
+  return view('policy');
+})->name('policy.show');
 
 // Dashboard routes (protected by authentication)
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->prefix('dashboard')->group(function () {
-    // Main Page Dashboard
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',])->prefix('dashboard')->group(function () {
+  // Main Page Dashboard
 
-    //sitemap routes
-    Route::get('/sitemap', [SitemapController::class, 'index'])->name('sitemap.index');
-    Route::get('/sitemap/generate', [SitemapController::class, 'generate'])->name('sitemap.generate')->middleware('can:manage sitemap');
-    Route::get('/sitemap/manage', [SitemapController::class, 'manageIndex'])->name('sitemap.manage')->middleware('can:manage sitemap');
-    Route::post('/sitemap/update', [SitemapController::class, 'updateResourceInclusion'])->name('sitemap.updateResourceInclusion')->middleware('can:manage sitemap');
-    Route::delete('/sitemap/delete/{type}/{database}', [SitemapController::class, 'delete'])->name('sitemap.delete')->middleware('can:manage sitemap');
+  Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
 
-
-    Route::get('sitemap/generate-articles', [SitemapController::class, 'generateArticlesSitemap'])->name('sitemap.generate.articles');
-    Route::get('sitemap/generate-news', [SitemapController::class, 'generateNewsSitemap'])->name('sitemap.generate.news');
-    Route::get('sitemap/generate-static', [SitemapController::class, 'generateStaticSitemap'])->name('sitemap.generate.static');
+  //sitemap routes
+  Route::get('/sitemap', [SitemapController::class, 'index'])->name('sitemap.index');
+  Route::get('/sitemap/generate', [SitemapController::class, 'generate'])->name('sitemap.generate')->middleware('can:manage sitemap');
+  Route::get('/sitemap/manage', [SitemapController::class, 'manageIndex'])->name('sitemap.manage')->middleware('can:manage sitemap');
+  Route::post('/sitemap/update', [SitemapController::class, 'updateResourceInclusion'])->name('sitemap.updateResourceInclusion')->middleware('can:manage sitemap');
+  Route::delete('/sitemap/delete/{type}/{database}', [SitemapController::class, 'delete'])->name('sitemap.delete')->middleware('can:manage sitemap');
 
 
-    //calendar
-    Route::get('calendar/{month?}/{year?}', [CalendarController::class, 'calendar'])->name('calendar.index')->middleware('can:manage calendar');
-    Route::post('calendar/event', [CalendarController::class, 'store'])->name('events.store')->middleware('can:manage calendar');
-    Route::put('calendar/event/{event}', [CalendarController::class, 'update'])->name('events.update')->middleware('can:manage calendar');
-    Route::delete('calendar/event/{event}', [CalendarController::class, 'destroy'])->name('events.destroy')->middleware('can:manage calendar');
-
-    // Classes routes
-    Route::resource('classes', SchoolClassController::class)->middleware(['can:manage classes']);
-
-    // Subjects routes
-    Route::resource('subjects', SubjectController::class)->middleware(['can:manage subjects']);
-    Route::get('subjects/by-grade/{grade_level}', [SubjectController::class, 'indexByGrade'])->name('subjects.byGrade')->middleware('can:manage subjects');
-    Route::get('/get-classes-by-country/{country}', [SubjectController::class, 'getClassesByCountry']);
-
-    // Semesters routes
-    Route::resource('semesters', SemesterController::class)->middleware(['can:manage semesters']);
-
-    // Articles routes
-    Route::resource('articles', ArticleController::class)->except(['show'])->middleware(['can:manage articles']);
-     Route::get('articles/class/{grade_level}', [ArticleController::class, 'indexByClass'])->name('articles.forClass')->middleware('can:manage articles');
-    Route::get('articles/{article}', [ArticleController::class, 'show'])->name('articles.show')->middleware('can:manage articles');
+  Route::get('sitemap/generate-articles', [SitemapController::class, 'generateArticlesSitemap'])->name('sitemap.generate.articles');
+  Route::get('sitemap/generate-news', [SitemapController::class, 'generateNewsSitemap'])->name('sitemap.generate.news');
+  Route::get('sitemap/generate-static', [SitemapController::class, 'generateStaticSitemap'])->name('sitemap.generate.static');
 
 
-    // Files routes
-    Route::resource('files', FileController::class);
+  //calendar
+  Route::get('calendar/{month?}/{year?}', [CalendarController::class, 'calendar'])->name('calendar.index')->middleware('can:manage calendar');
+  Route::post('calendar/event', [CalendarController::class, 'store'])->name('events.store')->middleware('can:manage calendar');
+  Route::put('calendar/event/{event}', [CalendarController::class, 'update'])->name('events.update')->middleware('can:manage calendar');
+  Route::delete('calendar/event/{event}', [CalendarController::class, 'destroy'])->name('events.destroy')->middleware('can:manage calendar');
 
-    // News routes
-     Route::resource('news', NewsController::class)->middleware(['can:manage news']);
+  // Classes routes
+  Route::resource('classes', SchoolClassController::class)->middleware(['can:manage classes']);
 
-    // Categories News routes
-     Route::resource('categories', CategoryController::class)->middleware(['can:manage Categories']);
+  // Subjects routes
+  Route::resource('subjects', SubjectController::class)->middleware(['can:manage subjects']);
+  Route::get('subjects/by-grade/{grade_level}', [SubjectController::class, 'indexByGrade'])->name('subjects.byGrade')->middleware('can:manage subjects');
+  Route::get('/get-classes-by-country/{country}', [SubjectController::class, 'getClassesByCountry']);
 
-    // Settings routes
-    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('can:manage settings');
-    Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update')->middleware('can:manage settings');
+  // Semesters routes
+  Route::resource('semesters', SemesterController::class)->middleware(['can:manage semesters']);
 
-    // Error page route
-    Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('dashboard.pages-misc-error');
+  // Articles routes
+  Route::resource('articles', ArticleController::class)->except(['show'])->middleware(['can:manage articles']);
+  Route::get('articles/class/{grade_level}', [ArticleController::class, 'indexByClass'])->name('articles.forClass')->middleware('can:manage articles');
+  Route::get('articles/{article}', [ArticleController::class, 'show'])->name('articles.show')->middleware('can:manage articles');
 
-    // Role & Permission Management routes
-    Route::resource('roles', RoleController::class)->middleware(['can:manage roles']);
-    Route::resource('permissions', PermissionController::class)->middleware(['can:manage permissions']);
 
-    // Users routes
-    Route::resource('users', UserController::class);
-    Route::get('/users/{user}/permissions-roles', [UserController::class, 'permissions_roles'])->name('users.permissions_roles')->middleware('can:manage permissions');
-    Route::put('/users/{user}/permissions-roles', [UserController::class, 'updatePermissionsRoles'])->name('users.updatePermissionsRoles')->middleware('can:manage permissions');
+  // Files routes
+  Route::resource('files', FileController::class);
 
-    // Notifications routes
-    Route::resource('notifications', NotificationController::class)->only(['index', 'destroy']);
+  // News routes
+  Route::resource('news', NewsController::class)->middleware(['can:manage news']);
 
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-    Route::post('/notifications/handle-actions', [NotificationController::class, 'handleActions'])->name('notifications.handleActions');
-    Route::post('/notifications/{id}/delete', [NotificationController::class, 'delete'])->name('notifications.delete');
-    Route::patch('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+  // Categories News routes
+  Route::resource('categories', CategoryController::class)->middleware(['can:manage Categories']);
 
-    // Comments & Reactions routes
-    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::post('/reactions', [ReactionController::class, 'store'])->name('reactions.store');
+  // Settings routes
+  Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('can:manage settings');
+  Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update')->middleware('can:manage settings');
 
-    // messages
+  // Error page route
+  Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('dashboard.pages-misc-error');
+
+  // Role & Permission Management routes
+  Route::resource('roles', RoleController::class)->middleware(['can:manage roles']);
+  Route::resource('permissions', PermissionController::class)->middleware(['can:manage permissions']);
+
+  // Users routes
+  Route::resource('users', UserController::class);
+  Route::get('/users/{user}/permissions-roles', [UserController::class, 'permissions_roles'])->name('users.permissions_roles')->middleware('can:manage permissions');
+  Route::put('/users/{user}/permissions-roles', [UserController::class, 'updatePermissionsRoles'])->name('users.updatePermissionsRoles')->middleware('can:manage permissions');
+
+  // Notifications routes
+  Route::resource('notifications', NotificationController::class)->only(['index', 'destroy']);
+
+  Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+  Route::post('/notifications/handle-actions', [NotificationController::class, 'handleActions'])->name('notifications.handleActions');
+  Route::post('/notifications/{id}/delete', [NotificationController::class, 'delete'])->name('notifications.delete');
+  Route::patch('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+
+  // Comments & Reactions routes
+  Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+  Route::post('/reactions', [ReactionController::class, 'store'])->name('reactions.store');
+
+  // messages
   Route::prefix('messages')->group(function () {
     Route::get('compose', [MessageController::class, 'compose'])->name('messages.compose');
     Route::post('send', [MessageController::class, 'send'])->name('messages.send');
@@ -145,23 +153,24 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::post('{id}/reply', [MessageController::class, 'reply'])->name('messages.reply');
     Route::post('/{id}/mark-as-read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
     Route::post('{id}/toggle-important', [MessageController::class, 'toggleImportant'])->name('messages.toggleImportant');
-   });
-
+  });
 });
 
 // Lesson for the Class
-Route::prefix('{database}')->group(function () {
+Route::group([
+  'prefix' => '{database}/lesson',
+  'where' => ['database' => '^(?!api$).*$']
+], function () {
   Route::prefix('lesson')->group(function () {
-   Route::get('/', [GradeOneController::class, 'index'])->name('class.index');
-   Route::get('/{id}', [GradeOneController::class, 'show'])->name('frontend.class.show');
-   Route::get('subjects/{subject}', [GradeOneController::class, 'showSubject'])->name('frontend.subjects.show');
-   Route::get('subjects/{subject}/articles/{semester}/{category}', [GradeOneController::class, 'subjectArticles'])->name('frontend.subject.articles');
-   Route::get('/articles/{article}', [GradeOneController::class, 'showArticle'])->name('frontend.articles.show');
-   Route::get('files/download/{id}', [FileController::class, 'downloadFile'])->name('files.download');
-
+    Route::get('/', [GradeOneController::class, 'index'])->name('class.index');
+    Route::get('/{id}', [GradeOneController::class, 'show'])->name('frontend.class.show');
+    Route::get('subjects/{subject}', [GradeOneController::class, 'showSubject'])->name('frontend.subjects.show');
+    Route::get('subjects/{subject}/articles/{semester}/{category}', [GradeOneController::class, 'subjectArticles'])->name('frontend.subject.articles');
+    Route::get('/articles/{article}', [GradeOneController::class, 'showArticle'])->name('frontend.articles.show');
+    Route::get('files/download/{id}', [FileController::class, 'downloadFile'])->name('files.download');
   });
 
- // Keywords for the frontend
+  // Keywords for the frontend
   Route::get('/keywords', [KeywordController::class, 'index'])->name('frontend.keywords.index');
   Route::get('/keywords/{keywords}', [KeywordController::class, 'indexByKeyword'])->name('keywords.indexByKeyword');
 
@@ -172,18 +181,17 @@ Route::prefix('{database}')->group(function () {
   Route::get('/news/category/{category}', [FrontendNewsController::class, 'category'])->name('frontend.news.category');
 
   // Filter routes for news
- Route::get('news/filter', [FrontendNewsController::class, 'filterNewsByCategory'])->name('frontend.news.filter');
+  Route::get('news/filter', [FrontendNewsController::class, 'filterNewsByCategory'])->name('frontend.news.filter');
 
- Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('frontend.categories.show');
-
+  Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('frontend.categories.show');
 });
 
-  // Filter routes
-  Route::get('/filter-files', [FilterController::class, 'index'])->name('files.filter');
-  Route::get('/api/subjects/{classId}', [FilterController::class, 'getSubjectsByClass']);
-  Route::get('/api/semesters/{subjectId}', [FilterController::class, 'getSemestersBySubject']);
-  Route::get('/api/files/{semesterId}', [FilterController::class, 'getFileTypesBySemester']);
-  // File downloaded waited
+// Filter routes
+Route::get('/filter-files', [FilterController::class, 'index'])->name('files.filter');
+Route::get('/api/subjects/{classId}', [FilterController::class, 'getSubjectsByClass']);
+Route::get('/api/semesters/{subjectId}', [FilterController::class, 'getSemestersBySubject']);
+Route::get('/api/files/{semesterId}', [FilterController::class, 'getFileTypesBySemester']);
+// File downloaded waited
 
-  Route::get('/download/{file}', [FileController::class, 'showDownloadPage'])->name('download.page');
-  Route::get('/download-wait/{file}', [FileController::class, 'processDownload'])->name('download.wait');
+Route::get('/download/{file}', [FileController::class, 'showDownloadPage'])->name('download.page');
+Route::get('/download-wait/{file}', [FileController::class, 'processDownload'])->name('download.wait');

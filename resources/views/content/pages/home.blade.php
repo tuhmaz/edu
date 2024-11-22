@@ -242,9 +242,9 @@ $icons = [
                   </div>
                 </div>
                 <div class="text-center mt-4">
-  <button type="submit" class="btn btn-primary w-100 mb-2" style="max-width: 300px;">{{ __('Filter Files') }}</button>
-  <button type="reset" class="btn btn-secondary w-100" style="max-width: 300px;">{{ __('Reset') }}</button>
-</div>
+                  <button type="submit" class="btn btn-primary w-100 mb-2" style="max-width: 300px;">{{ __('Filter Files') }}</button>
+                  <button type="reset" class="btn btn-secondary w-100" style="max-width: 300px;">{{ __('Reset') }}</button>
+                </div>
               </form>
             </div>
           </div>
@@ -282,7 +282,7 @@ $icons = [
                   @endphp
 
                   <li class="list-group-item d-flex align-items-center">
-                    <img src="{{ $imagePath }}" class="img-thumbnail me-3" style="width: 80px;" alt="{{ $newsItem->title }}" loading="lazy">
+                    <img src="{{ $imagePath }}" class="img-thumbnail me-3" style="width: 80px;" loading="lazy" alt="{{ $newsItem->title }}" loading="lazy">
                     <div>
                       <h6 class="mb-0">{{ $newsItem->title }}</h6>
                       <small class="text-muted">{{ Str::limit(strip_tags($newsItem->description), 60) }}</small>

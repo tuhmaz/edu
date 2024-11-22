@@ -49,8 +49,7 @@
     45 => 'App\\Providers\\MenuServiceProvider',
     46 => 'App\\Providers\\SettingsServiceProvider',
     47 => 'Spatie\\Permission\\PermissionServiceProvider',
-    48 => 'App\\Providers\\SettingsServiceProvider',
-    49 => 'Berkayk\\OneSignal\\OneSignalServiceProvider',
+    48 => 'Berkayk\\OneSignal\\OneSignalServiceProvider',
   ),
   'eager' => 
   array (
@@ -86,8 +85,7 @@
     29 => 'App\\Providers\\MenuServiceProvider',
     30 => 'App\\Providers\\SettingsServiceProvider',
     31 => 'Spatie\\Permission\\PermissionServiceProvider',
-    32 => 'App\\Providers\\SettingsServiceProvider',
-    33 => 'Berkayk\\OneSignal\\OneSignalServiceProvider',
+    32 => 'Berkayk\\OneSignal\\OneSignalServiceProvider',
   ),
   'deferred' => 
   array (
