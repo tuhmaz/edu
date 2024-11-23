@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\SchoolClassController;
 use App\Http\Controllers\Api\SubjectController;
@@ -25,10 +24,14 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\AuthController;
+
 
 // Open Routes
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'api.register']);
+
 Route::post('/login', [AuthController::class, 'login']);
+
 
 // Forgot Password
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('api.password.email');

@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -38,7 +41,11 @@ class AuthController extends Controller
     // Automatically log in the user
     Auth::login($user);
 
-    return redirect('/')->with('message', 'Registration successful. Welcome!');
+    return response()->json([
+      'status' => true,
+      'message' => 'User registered successfully.',
+      'data' => $user,
+  ], 201);
   }
 
   /**
@@ -75,12 +82,12 @@ class AuthController extends Controller
       // Generate a token using Sanctum
       $token = $user->createToken('AccessToken')->plainTextToken;
 
-      // Check if the request expects JSON (API) or web response
-      
-      // Redirect to the homepage with a success message and set a cookie for web requests
-      return redirect('/')
-          ->with('message', 'Login successful.')
-          ->cookie('access_token', $token, 60 * 24); // Store the token in a cookie
+      return response()->json([
+        'status' => true,
+        'message' => 'Login successful.',
+        'token' => $token,
+        'user' => $user,
+    ], 200);
   }
 
 
